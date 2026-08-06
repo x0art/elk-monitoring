@@ -100,9 +100,11 @@ redirect_max_hops: int = 10
 - `DELETE /api/redirects/{id}` — stop tracking (edges kept for history), 404 if absent.
 - `POST /api/redirects/check` — body `{url?}`; checks all tracked URLs (or one). Returns
   `{checked: N, updated: [...]}` with per-URL results.
-- `GET /api/redirects/graph` — `{nodes, links}`: nodes are tracked URLs (id=`url:{id}`,
-  label=url, kind, status, count=history_count); links are all edges with an `active` flag
-  (`{source: url, target: url, http_status, active}`). UI filters active/historical.
+- `GET /api/redirects/graph` — `{nodes, links}`: node `id` is the URL string itself (URLs
+  are unique in `tracked_urls`, and `redirect_edges` already stores raw URLs), plus `label`,
+  `status`, `history_count`. Links are all edges as `{source: url, target: url, http_status,
+  active}`. The client omits links whose endpoints are not in the node list (same guard as
+  the Traffic Graph), so deleting a tracked URL removes it and its edges from view.
 - `GET /api/redirects/{id}/history` — all edges for one URL:
   `{url, edges: [{target_url, http_status, first_seen_at, last_seen_at, active}]}`.
 
